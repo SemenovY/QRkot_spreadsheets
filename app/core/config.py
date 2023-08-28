@@ -13,6 +13,8 @@ DEFAULT_MIN_STRING_LENGTH = 1
 DEFAULT_MAX_STRING_LENGTH = 100
 DEFAULT_ZERO_COUNT = 0
 LIFETIME_SECONDS = 3600
+FORMAT = "%Y/%m/%d %H:%M:%S"
+
 
 
 class Settings(BaseSettings):
@@ -32,8 +34,8 @@ class Settings(BaseSettings):
     min_password_length: int = DEFAULT_MIN_PASSWORD_LENGTH
     min_string_length: int = DEFAULT_MIN_STRING_LENGTH
     max_string_length: int = DEFAULT_MAX_STRING_LENGTH
-    zero_count = DEFAULT_ZERO_COUNT
-    lifetime_seconds = LIFETIME_SECONDS
+    zero_count: int = DEFAULT_ZERO_COUNT
+    lifetime_seconds: int = LIFETIME_SECONDS
     first_superuser_email: Optional[EmailStr] = None
     first_superuser_password: Optional[str] = None
     type: Optional[str] = None
@@ -48,6 +50,7 @@ class Settings(BaseSettings):
     client_x509_cert_url: Optional[str] = None
     email: Optional[str] = None
     admin_email: Optional[str] = None
+    format = FORMAT
 
     class Config:
         """
