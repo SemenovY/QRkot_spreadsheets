@@ -50,19 +50,15 @@ class CRUDCharityProject(CRUDBase):
         for project in projects:
 
             collection_time = (
-                    func.julianday(CharityProject.close_date)
-                    - func.julianday(CharityProject.create_date)).label(
-                'collection time'
+                (func.julianday(CharityProject.close_date)
+                 - func.julianday(CharityProject.create_date))
+                .label('collection time')
             )
 
             close_projects.append(
-                {
-                    'Название проекта': project.name,
-                    'Время сбора': str(
-                        project.close_date - project.create_date
-                        ),
-                    'Описание': project.description
-                }
+                {'Название проекта': project.name,
+                 'Время сбора': str(project.close_date - project.create_date),
+                 'Описание': project.description}
             )
             close_projects = await session.execute(
                 select(

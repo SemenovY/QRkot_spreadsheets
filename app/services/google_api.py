@@ -25,10 +25,10 @@ SPREAD_SHEET_BODY = {
 }
 
 TABLE_VALUES = [
-        ['Отчет от', NOW_DATE_TIME],
-        ['Топ проектов по скорости закрытия'],
-        ['Название проекта', 'Время сбора', 'Описание']
-    ]
+    ['Отчет от', NOW_DATE_TIME],
+    ['Топ проектов по скорости закрытия'],
+    ['Название проекта', 'Время сбора', 'Описание']
+]
 
 
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
@@ -59,7 +59,7 @@ async def set_user_permissions(
         'type': 'user',
         'role': 'writer',
         'emailAddress': settings.email
-        }
+    }
     service = await wrapper_services.discover('drive', 'v3')
     await wrapper_services.as_service_account(
         service.permissions.create(
@@ -96,7 +96,7 @@ async def spreadsheets_update_value(
         'values': table_values
     }
 
-    response = await wrapper_services.as_service_account(
+    _ = await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheetid,
             range='A1:E30',
