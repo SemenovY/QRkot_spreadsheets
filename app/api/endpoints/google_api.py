@@ -8,8 +8,6 @@
 объект AsyncSession для работы с асинхронными сессиями;
 объект Aiogoogle — объект «обёртки», передаётся из настроек.
 """
-from typing import Dict, List
-
 from aiogoogle import Aiogoogle
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,7 +28,7 @@ router = APIRouter()
 
 @router.post(
     '/',
-    response_model=List[Dict[str, str]],
+    response_model=list[dict[str, str]],
     dependencies=[Depends(current_superuser)],
 )
 async def get_report(

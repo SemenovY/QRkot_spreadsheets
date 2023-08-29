@@ -7,9 +7,10 @@
 цель — просто узнать, есть ли в базе такой объект.
 Если в базе нет одноимённого проекта — функция вернёт None.
 """
-from typing import Dict, List, Optional
+from datetime import timedelta
+from typing import Dict, List, Optional, Union
 
-from sqlalchemy import select
+from sqlalchemy import func, select, true
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
@@ -34,7 +35,7 @@ class CRUDCharityProject(CRUDBase):
     async def get_projects_by_completion_rate(
             self,
             session: AsyncSession,
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, Union[str, timedelta]]]:
         """
         Метод отсортирует список со всеми закрытыми проектами.
         """
@@ -55,6 +56,22 @@ class CRUDCharityProject(CRUDBase):
                     'Описание': object.description
                 }
             )
+            datetime_difference_in_days = (
+                    func.julianday(
+                        CharityProject.close_date
+                    ) - func.julianday(
+                CharityProject.create_date
+            )).label('duration')
+            objects_list = await session.execute(
+                select(
+                    CharityProject.name,
+                    datetime_difference_in_days,
+                    CharityProject.description
+                ).where(
+                    CharityProject.fully_invested == true()
+                ).order_by('duration')
+            )
+            objects_list = objects_list.all()
             return objects_list
 
 
