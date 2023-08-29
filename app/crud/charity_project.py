@@ -35,44 +35,47 @@ class CRUDCharityProject(CRUDBase):
     async def get_projects_by_completion_rate(
             self,
             session: AsyncSession,
-    ) -> list[dict[str, Union[str, timedelta]]]:
+    ) -> List[Dict[str, Union[str, timedelta]]]:
         """
         Метод отсортирует список со всеми закрытыми проектами.
         """
 
-        objects = await session.execute(
+        projects = await session.execute(
             select(CharityProject)
             .where(CharityProject.fully_invested)
         )
-        objects_list = []
-        objects = objects.scalars().all()
-        for object in objects:
-            objects_list.append(
+        projects = projects.scalars().all()
+
+        close_projects = []
+        for project in projects:
+
+            collection_time = (
+                    func.julianday(CharityProject.close_date)
+                    - func.julianday(CharityProject.create_date)).label(
+                'collection time'
+            )
+
+            close_projects.append(
                 {
-                    'Название проекта': object.name,
+                    'Название проекта': project.name,
                     'Время сбора': str(
-                        object.close_date - object.create_date
+                        project.close_date - project.create_date
                         ),
-                    'Описание': object.description
+                    'Описание': project.description
                 }
             )
-            datetime_difference_in_days = (
-                    func.julianday(
-                        CharityProject.close_date
-                    ) - func.julianday(
-                CharityProject.create_date
-            )).label('duration')
-            objects_list = await session.execute(
+            close_projects = await session.execute(
                 select(
                     CharityProject.name,
-                    datetime_difference_in_days,
+                    collection_time,
                     CharityProject.description
                 ).where(
                     CharityProject.fully_invested == true()
-                ).order_by('duration')
+                ).order_by('collection time')
             )
-            objects_list = objects_list.all()
-            return objects_list
+            close_projects = close_projects.all()
+
+            return close_projects
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)

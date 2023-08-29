@@ -2,29 +2,30 @@
 Функции взаимодействия приложения с Google API
 """
 from datetime import datetime, timedelta
-from typing import List
+from typing import Dict, List
 
 from aiogoogle import Aiogoogle
 from app.core.config import settings
-from app.models import CharityProject
 
 ROWCOUNT = 100
-COLUMNCOUNT = 11
-NOWDATETIME = datetime.now().strftime(settings.format)
-SPREADSHEETBODY = {
-    'properties': {'title': f'Отчет на {NOWDATETIME}',
+COLUMN_COUNT = 11
+NOW_DATE_TIME = datetime.now().strftime(settings.format)
+
+SPREAD_SHEET_BODY = {
+    'properties': {'title': f'Отчет на {NOW_DATE_TIME}',
                    'locale': 'ru_RU'},
     'sheets': [{'properties': {'sheetType': 'GRID',
                                'sheetId': settings.zero_count,
                                'title': 'Лист1',
                                'gridProperties': {
                                    'rowCount': ROWCOUNT,
-                                   'columnCount': COLUMNCOUNT
+                                   'columnCount': COLUMN_COUNT
                                }}}
                ]
 }
+
 TABLE_VALUES = [
-        ['Отчет от', NOWDATETIME],
+        ['Отчет от', NOW_DATE_TIME],
         ['Топ проектов по скорости закрытия'],
         ['Название проекта', 'Время сбора', 'Описание']
     ]
@@ -36,7 +37,7 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     Aiogoogle и возвращать строку с ID созданного документа.
     """
     service = await wrapper_services.discover('sheets', 'v4')
-    spreadsheet_body = SPREADSHEETBODY
+    spreadsheet_body = SPREAD_SHEET_BODY
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
     )
@@ -54,9 +55,11 @@ async def set_user_permissions(
     принимать строку с ID документа, на который надо дать права доступа,
     и экземпляр класса Aiogoogle.
     """
-    permissions_body = {'type': 'user',
-                        'role': 'writer',
-                        'emailAddress': settings.email}
+    permissions_body = {
+        'type': 'user',
+        'role': 'writer',
+        'emailAddress': settings.email
+        }
     service = await wrapper_services.discover('drive', 'v3')
     await wrapper_services.as_service_account(
         service.permissions.create(
@@ -68,7 +71,7 @@ async def set_user_permissions(
 
 async def spreadsheets_update_value(
         spreadsheetid: str,
-        objects: list[CharityProject],
+        projects: List[Dict],
         wrapper_services: Aiogoogle
 ) -> None:
     """
@@ -80,8 +83,13 @@ async def spreadsheets_update_value(
     service = await wrapper_services.discover('sheets', 'v4')
     table_values = TABLE_VALUES.copy()
 
-    for project in objects:
-        TABLE_VALUES.append((project['name'], str(timedelta(project['duration'])), project['description']))
+    for project in projects:
+        table_values.append(
+            (project['name'],
+             str(timedelta(project['collection time'])),
+             project['description']
+             )
+        )
 
     update_body = {
         'majorDimension': 'ROWS',

@@ -8,6 +8,8 @@
 объект AsyncSession для работы с асинхронными сессиями;
 объект Aiogoogle — объект «обёртки», передаётся из настроек.
 """
+from typing import Dict, List
+
 from aiogoogle import Aiogoogle
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +30,7 @@ router = APIRouter()
 
 @router.post(
     '/',
-    response_model=list[dict[str, str]],
+    response_model=List[Dict[str, str]],
     dependencies=[Depends(current_superuser)],
 )
 async def get_report(
@@ -38,18 +40,16 @@ async def get_report(
     """
     Только для суперюзеров.
     """
-    objects = await charity_project_crud.get_projects_by_completion_rate(
+    projects = await charity_project_crud.get_projects_by_completion_rate(
         session
     )
 
     spreadsheetid = await spreadsheets_create(wrapper_services)
     await set_user_permissions(spreadsheetid, wrapper_services)
-    try:
-        await spreadsheets_update_value(
+    await spreadsheets_update_value(
             spreadsheetid,
-            objects,
+            projects,
             wrapper_services
             )
-    except ValueError:
-        raise ValueError('Данные не обновились!')
-    return objects
+
+    return projects
