@@ -50,8 +50,8 @@ class CRUDCharityProject(CRUDBase):
         for project in projects:
 
             collection_time = (
-                (func.julianday(CharityProject.close_date)
-                 - func.julianday(CharityProject.create_date))
+                (func.julianday(CharityProject.close_date) -
+                 func.julianday(CharityProject.create_date))
                 .label('collection time')
             )
 
