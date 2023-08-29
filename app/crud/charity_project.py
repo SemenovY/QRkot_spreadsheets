@@ -7,7 +7,7 @@
 цель — просто узнать, есть ли в базе такой объект.
 Если в базе нет одноимённого проекта — функция вернёт None.
 """
-from typing import Optional
+from typing import Dict, List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,6 +30,32 @@ class CRUDCharityProject(CRUDBase):
         )
         db_project_id = db_project_id.scalars().first()
         return db_project_id
+
+    async def get_projects_by_completion_rate(
+            self,
+            session: AsyncSession,
+    ) -> List[Dict[str, str]]:
+        """
+        Метод отсортирует список со всеми закрытыми проектами.
+        """
+
+        objects = await session.execute(
+            select(CharityProject)
+            .where(CharityProject.fully_invested)
+        )
+        objects_list = []
+        objects = objects.scalars().all()
+        for object in objects:
+            objects_list.append(
+                {
+                    'Название проекта': object.name,
+                    'Время сбора': str(
+                        object.close_date - object.create_date
+                        ),
+                    'Описание': object.description
+                }
+            )
+            return objects_list
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)

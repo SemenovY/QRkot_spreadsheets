@@ -16,7 +16,6 @@ LIFETIME_SECONDS = 3600
 FORMAT = "%Y/%m/%d %H:%M:%S"
 
 
-
 class Settings(BaseSettings):
     """
     BaseSettings.

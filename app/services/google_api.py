@@ -2,9 +2,14 @@
 Функции взаимодействия приложения с Google API
 """
 from datetime import datetime
+from typing import List
 
 from aiogoogle import Aiogoogle
 from app.core.config import settings
+from app.models import CharityProject
+
+ROWCOUNT = 100
+COLUMNCOUNT = 11
 
 
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
@@ -18,10 +23,13 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
         'properties': {'title': f'Отчет на {now_date_time}',
                        'locale': 'ru_RU'},
         'sheets': [{'properties': {'sheetType': 'GRID',
-                                   'sheetId': 0,
+                                   'sheetId': settings.zero_count,
                                    'title': 'Лист1',
-                                   'gridProperties': {'rowCount': 100,
-                                                      'columnCount': 11}}}]
+                                   'gridProperties': {
+                                       'rowCount': ROWCOUNT,
+                                       'columnCount': COLUMNCOUNT
+                                   }}}
+                   ]
     }
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
@@ -54,7 +62,7 @@ async def set_user_permissions(
 
 async def spreadsheets_update_value(
         spreadsheetid: str,
-        donations: list,
+        objects: List[CharityProject],
         wrapper_services: Aiogoogle
 ) -> None:
     """
@@ -71,19 +79,21 @@ async def spreadsheets_update_value(
         ['Название проекта', 'Время сбора', 'Описание']
 
     ]
-    for res in donations:
-        print(str(res))
-        new_row = [
-            # str(res.name),
-            # str(res['count']),
-            # str(res.description)
-        ]
-        table_values.append(new_row)
+    # table_values[0].append(now_date_time)
+    # table_values = [*table_values,
+    #                 *[list(map(str,
+    #                            [project.name,
+    #                             project.close_date - project.create_date,
+    #                             project.description])) for project in
+    #                   objects]
+    #                 ]
 
     update_body = {
         'majorDimension': 'ROWS',
         'values': table_values
     }
+
+
     response = await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheetid,
