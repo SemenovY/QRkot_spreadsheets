@@ -69,12 +69,14 @@ async def spreadsheets_update_value(
         ['Отчет от', now_date_time],
         ['Топ проектов по скорости закрытия'],
         ['Название проекта', 'Время сбора', 'Описание']
+
     ]
     for res in donations:
+        print(str(res))
         new_row = [
-            str(res['name']),
-            str(res['count']),
-            str(res['description'])
+            # str(res.name),
+            # str(res['count']),
+            # str(res.description)
         ]
         table_values.append(new_row)
 

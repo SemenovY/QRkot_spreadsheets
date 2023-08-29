@@ -8,6 +8,7 @@
 объект AsyncSession для работы с асинхронными сессиями;
 объект Aiogoogle — объект «обёртки», передаётся из настроек.
 """
+from datetime import datetime
 from typing import List
 
 from aiogoogle import Aiogoogle
@@ -31,16 +32,12 @@ router = APIRouter()
 
 @router.post(
     '/',
-    response_model=list[dict[str, int]],
+    # response_model=list[dict[str, int]],
+    response_model=List[CharityProjectDB],
+
     dependencies=[Depends(current_superuser)],
 )
-# @router.get(
-#     '/',
-#     response_model=list[dict[str, int]],
-#     dependencies=[Depends(current_superuser)],
-# )
 async def get_report(
-
         session: AsyncSession = Depends(get_async_session),
         wrapper_services: Aiogoogle = Depends(get_service)
 ):

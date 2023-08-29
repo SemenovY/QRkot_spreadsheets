@@ -1,13 +1,15 @@
 """
 Для донатов CRUD наследуем базовый, добавив метод получения юзера.
 """
+from datetime import datetime
 from typing import List
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.crud.base import CRUDBase
+from app.crud.charity_project import charity_project_crud
 
 from app.models import CharityProject, Donation
 from app.models.user import User
@@ -31,15 +33,15 @@ class CRUDdonation(CRUDBase):
     async def get_projects_by_completion_rate(
             self,
             session: AsyncSession,
-    ) -> List[CharityProject]:
+    ) -> list[dict[str, int]]:
         """
         Метод отсортирует список со всеми закрытыми проектами.
         """
+
         objects = await session.execute(
             select(CharityProject)
             .where(CharityProject.fully_invested != settings.zero_count)
-            .order_by(CharityProject.create_date))
-
+        )
         return objects.scalars().all()
 
 
