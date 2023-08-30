@@ -10,9 +10,8 @@ from app.core.config import settings
 ROWCOUNT = 100
 COLUMN_COUNT = 11
 
-NOW_DATE_TIME = datetime.now().strftime(settings.format)
-SHEETS_VERSION = ('sheets', 'v4')
-DRIVE_VERSION = ('drive', 'v3')
+SHEETS_VERSION = {'sheets': 'v4'}
+DRIVE_VERSION = {'drive': 'v3'}
 
 SHEET_RANGE = 'A1:E30'
 VALUE_INPUT_OPTION = 'USER_ENTERED'
@@ -27,24 +26,11 @@ PERMISSIONS_FIELDS = 'id'
 USER_TYPE = 'user'
 USER_ROLE = 'writer'
 
-SPREAD_SHEET_BODY = {
-    'properties': {'title': f'Отчет на {NOW_DATE_TIME}',
-                   'locale': LOCALE},
-    'sheets': [{'properties': {'sheetType': SHEET_TYPE,
-                               'sheetId': settings.zero_count,
-                               'title': TITLE,
-                               'gridProperties': {
-                                   'rowCount': ROWCOUNT,
-                                   'columnCount': COLUMN_COUNT
-                               }}}
-               ]
-}
-
-TABLE_VALUES = [
-    ['Отчет от', NOW_DATE_TIME],
-    ['Топ проектов по скорости закрытия'],
-    ['Название проекта', 'Время сбора', 'Описание']
-]
+SHEET_PROPERTIES = {'sheetType': SHEET_TYPE,
+                    'sheetId': settings.zero_count,
+                    'title': TITLE}
+GRID_PROPERTIES = {'gridProperties': {'rowCount': ROWCOUNT,
+                   'columnCount': COLUMN_COUNT}}
 
 
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
@@ -52,8 +38,14 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     Функция создания таблицы должна получать на вход экземпляр класса
     Aiogoogle и возвращать строку с ID созданного документа.
     """
+    date_time_now = datetime.now().strftime(settings.format)
     service = await wrapper_services.discover(SHEETS_VERSION)
-    spreadsheet_body = SPREAD_SHEET_BODY
+
+    spreadsheet_body = {'properties': {'title': f'Отчет на {date_time_now}',
+                                       'locale': LOCALE},
+                        'sheets': [{'properties': {**SHEET_PROPERTIES,
+                                    **GRID_PROPERTIES}}]}
+
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
     )
@@ -96,8 +88,13 @@ async def spreadsheets_update_value(
     В качестве параметров эта функция будет получать ID документа,
     информацию из базы и объект Aiogoogle.
     """
+    date_time_now = datetime.now().strftime(settings.format)
     service = await wrapper_services.discover(SHEETS_VERSION)
-    table_values = TABLE_VALUES.copy()
+    table_values = [
+        ['Отчет от', date_time_now],
+        ['Топ проектов по скорости закрытия'],
+        ['Название проекта', 'Время сбора', 'Описание']
+    ]
 
     for project in projects:
         table_values.append(
