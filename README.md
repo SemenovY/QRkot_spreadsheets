@@ -1,6 +1,6 @@
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat&logo=Python&logoColor=ffffff&color=043A6B)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/-FastAPI-464646?style=flat&logo=FastAPI&logoColor=ffffff&color=2334D058)](https://fastapi.tiangolo.com/)
-[![Google API](https://img.shields.io/badge/-Google API-464646?style=flat&logo=Google API&logoColor=ffffff&color=2734D058)](https://developers.google.com/apis-explorer?hl=ru)
+[![GoogleAPI](https://img.shields.io/badge/-GoogleAPI-464646?style=flat&logo=GoogleAPI&logoColor=ffffff&color=2734D058)](https://developers.google.com/apis-explorer?hl=ru)
 
 ________
 # Приложение для Благотворительного фонда QRKot
