@@ -9,14 +9,30 @@ from app.core.config import settings
 
 ROWCOUNT = 100
 COLUMN_COUNT = 11
+
 NOW_DATE_TIME = datetime.now().strftime(settings.format)
+SHEETS_VERSION = ('sheets', 'v4')
+DRIVE_VERSION = ('drive', 'v3')
+
+SHEET_RANGE = 'A1:E30'
+VALUE_INPUT_OPTION = 'USER_ENTERED'
+
+TITLE = 'Лист1'
+SHEET_TYPE = 'GRID'
+LOCALE = 'ru_RU'
+
+MAJOR_DIMENSION = 'ROWS'
+PERMISSIONS_FIELDS = 'id'
+
+USER_TYPE = 'user'
+USER_ROLE = 'writer'
 
 SPREAD_SHEET_BODY = {
     'properties': {'title': f'Отчет на {NOW_DATE_TIME}',
-                   'locale': 'ru_RU'},
-    'sheets': [{'properties': {'sheetType': 'GRID',
+                   'locale': LOCALE},
+    'sheets': [{'properties': {'sheetType': SHEET_TYPE,
                                'sheetId': settings.zero_count,
-                               'title': 'Лист1',
+                               'title': TITLE,
                                'gridProperties': {
                                    'rowCount': ROWCOUNT,
                                    'columnCount': COLUMN_COUNT
@@ -36,7 +52,7 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     Функция создания таблицы должна получать на вход экземпляр класса
     Aiogoogle и возвращать строку с ID созданного документа.
     """
-    service = await wrapper_services.discover('sheets', 'v4')
+    service = await wrapper_services.discover(SHEETS_VERSION)
     spreadsheet_body = SPREAD_SHEET_BODY
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
@@ -56,16 +72,16 @@ async def set_user_permissions(
     и экземпляр класса Aiogoogle.
     """
     permissions_body = {
-        'type': 'user',
-        'role': 'writer',
+        'type': USER_TYPE,
+        'role': USER_ROLE,
         'emailAddress': settings.email
     }
-    service = await wrapper_services.discover('drive', 'v3')
+    service = await wrapper_services.discover(DRIVE_VERSION)
     await wrapper_services.as_service_account(
         service.permissions.create(
             fileId=spreadsheetid,
             json=permissions_body,
-            fields="id"
+            fields=PERMISSIONS_FIELDS
         ))
 
 
@@ -80,7 +96,7 @@ async def spreadsheets_update_value(
     В качестве параметров эта функция будет получать ID документа,
     информацию из базы и объект Aiogoogle.
     """
-    service = await wrapper_services.discover('sheets', 'v4')
+    service = await wrapper_services.discover(SHEETS_VERSION)
     table_values = TABLE_VALUES.copy()
 
     for project in projects:
@@ -92,15 +108,15 @@ async def spreadsheets_update_value(
         )
 
     update_body = {
-        'majorDimension': 'ROWS',
+        'majorDimension': MAJOR_DIMENSION,
         'values': table_values
     }
 
     _ = await wrapper_services.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheetid,
-            range='A1:E30',
-            valueInputOption='USER_ENTERED',
+            range=SHEET_RANGE,
+            valueInputOption=VALUE_INPUT_OPTION,
             json=update_body
         )
     )
