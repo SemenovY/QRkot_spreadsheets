@@ -10,7 +10,7 @@ ________
 
 ## Оглавление
 
-* [Описание проекта](#описание-проекта)
+* [Описание проекта](#Описание проекта)
     * [Проекты](#проекты)
     * [Пожертвования](#пожертвования)
     * [Пользователи](#пользователи)
@@ -202,7 +202,7 @@ pytest
 
 _____________
 ***Над проектом работал:***
-* Семёнов Юрий | GitHub: [SemenovY](https://github.com/SemenovY)| Python developer.
+* Семёнов Юрий | GitHub: [SemenovY](https://github.com/SemenovY) | Python developer.
 
 ### *Free Software, Not for commercial use!*
 ### =^..^=______/
